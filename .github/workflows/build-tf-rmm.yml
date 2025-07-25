@@ -24,7 +24,7 @@ jobs:
       - name: Checkout caller repo
         uses: actions/checkout@v4
         with:
-          repository: opencca/tf-rmm
+          repository: ${{ github.repository }}
           ref: ${{ inputs.branch }}
           submodules: recursive
           clean: true
