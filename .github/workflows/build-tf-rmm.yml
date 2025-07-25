@@ -1,0 +1,46 @@
+name: tf-rmm build
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.branch }}
+  cancel-in-progress: true
+
+env:
+  CI_REPO: https://github.com/opencca/ci-scripts
+  CI_RUN_SCRIPT: run-ci.sh
+  CI_BUILD_SCRIPT: build-tf-rmm.sh
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout caller repo
+        uses: actions/checkout@v4
+        with:
+          repository: opencca/tf-rmm
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+          clean: true
+          path: tf-rmm
+
+      - name: Run build script
+        run: |
+          rm -rf .ci || true
+          git clone --depth 1 "$CI_REPO" .ci
+          cd .ci
+          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
+    
+      - name: Upload snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: tf-rmm-snapshot
+          path: snapshot/tf-rmm.elf
+          if-no-files-found: error
+
