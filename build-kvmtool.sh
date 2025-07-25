@@ -15,7 +15,7 @@ BUILD_DIR=$PROJECT_ROOT/opencca-build
 
 cd $BUILD_DIR/buildconf
 
-./firmware_opencca.mk rmm
+./kvmtool.mk build
 
 ls -al $SNAPSHOT_DIR
 

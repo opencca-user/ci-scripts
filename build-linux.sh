@@ -15,7 +15,8 @@ BUILD_DIR=$PROJECT_ROOT/opencca-build
 
 cd $BUILD_DIR/buildconf
 
-./firmware_opencca.mk rmm
+./linux.mk kernel
+./linux.mk debian 
 
 ls -al $SNAPSHOT_DIR
 
