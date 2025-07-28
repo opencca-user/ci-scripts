@@ -1,0 +1,103 @@
+name: build and snapshot
+
+on:
+  workflow_call:
+    inputs:
+      build_script:
+        required: true
+        type: string
+        description: "the ci build script to run"
+      artifact_name:
+        required: false
+        type: string
+        default: ""
+        description: "artifact name (for snapshot)"
+      artifact_path:
+        required: false
+        type: string
+        default: ""
+        description: "artifact path (for snapshot)"
+      upload_artifact:
+        required: false
+        type: boolean
+        default: false
+        description: "create temp. artifact snapshots in runner"
+      release_artifact:
+        required: false
+        type: boolean
+        default: false
+        description: "create a release"
+      release_name:
+        required: false
+        type: string
+        default: "generic"
+        description: "the project name of the release, e.g. linux, tf-rmm etc."
+
+permissions:
+  contents: write
+
+env:
+  CI_REPO: https://github.com/opencca/ci-scripts
+  CI_RUN_SCRIPT: run-ci.sh
+  RELEASE_REPO: opencca/opencca-releases
+
+jobs:
+  build-and-snapshot:
+    runs-on: self-hosted
+
+    steps:
+      - name: Run build script
+        run: |
+          rm -rf .ci || true
+          git clone --depth 1 "$CI_REPO" .ci
+          cd .ci
+          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"${{ inputs.build_script }}"
+
+      - name: Upload artifact
+        if: ${{ inputs.upload_artifact == true }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: ${{ inputs.artifact_path }}
+          if-no-files-found: error
+
+      - name: Prepare snapshot and latest tags
+        if: ${{ inputs.release_artifact == true }}
+        run: |
+          BRANCH_NAME="${GITHUB_REF##*/}"
+          SANITIZED_BRANCH="${BRANCH_NAME//\//-}"
+          TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+
+          TAG_NAME="${{ inputs.release_name }}/snapshot/${SANITIZED_BRANCH}/${TIMESTAMP}"
+          LATEST_TAG="${{ inputs.release_name }}/snapshot/${SANITIZED_BRANCH}/latest"
+
+          echo "RELEASE_TAG=$TAG_NAME" >> $GITHUB_ENV
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Upload snapshot release to releases repo
+        if: ${{ inputs.release_artifact == true }}
+        uses: softprops/action-gh-release@v2
+        with:
+          repository: ${{ env.RELEASE_REPO }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          body: ""
+          fail_on_unmatched_files: true
+          files: |
+            ${{ inputs.artifact_path }}
+        env:
+          token: ${{ secrets.RELEASES_REPO_TOKEN }}
+
+      - name: Update 'latest' tag in releases repo
+        if: ${{ inputs.release_artifact == true }}
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          git clone --bare https://x-access-token:${{ secrets.RELEASES_REPO_TOKEN }}@github.com/${RELEASE_REPO}.git releases-bare
+          cd releases-bare
+
+          git fetch origin "refs/tags/${RELEASE_TAG}:refs/tags/${RELEASE_TAG}" --depth=1
+          git tag -f "${LATEST_TAG}" "${RELEASE_TAG}"
+          git push origin ":refs/tags/${LATEST_TAG}" || true
+          git push origin "refs/tags/${LATEST_TAG}"
