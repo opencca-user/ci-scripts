@@ -44,6 +44,11 @@ TFA_REPO_BRANCH=opencca/main
 TFA_DIR=$PROJECT_ROOT/trusted-firmware-a
 clone_repo "$TFA_DIR" "$TFA_REPO" "$TFA_REPO_BRANCH"
 
+TFA_REPO=https://github.com/opencca/opencca-assets.git
+TFA_REPO_BRANCH=opencca/main
+TFA_DIR=$PROJECT_ROOT/opencca-assets
+clone_repo "$TFA_DIR" "$TFA_REPO" "$TFA_REPO_BRANCH"
+
 #
 # build firmware
 #
