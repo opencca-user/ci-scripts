@@ -11,10 +11,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ inputs.branch }}
   cancel-in-progress: true
 
-env:
-  CI_REPO: https://github.com/opencca/ci-scripts
-  CI_RUN_SCRIPT: run-ci.sh
-  CI_BUILD_SCRIPT: build-kvmtool.sh
 
 jobs:
   build-and-push:
@@ -29,18 +25,30 @@ jobs:
           submodules: recursive
           clean: true
           path: kvmtool
-
-      - name: Run build script
-        run: |
-          rm -rf .ci || true
-          git clone --depth 1 "$CI_REPO" .ci
-          cd .ci
-          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
-    
-      - name: Upload snapshot
-        uses: actions/upload-artifact@v4
+          
+      - name: Build and snapshot artifact
+        uses: ./.github/workflows/build-and-snapshot.yml
         with:
-          name: kvmtool-snapshot
-          path: snapshot/lkvm
-          if-no-files-found: error
+          build_script: build-kvmtool.sh
+          artifact_name: kvmtool-snapshot
+          artifact_path: snapshot/lkvm
+          upload_artifact: true
+          release_artifact: true
+          release_name: kvmtool
+
+      # - name: Run build script
+      #   run: |
+      #     rm -rf .ci || true
+      #     git clone --depth 1 "$CI_REPO" .ci
+      #     cd .ci
+      #     ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
+    
+      # - name: Upload snapshot
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: kvmtool-snapshot
+      #     path: snapshot/lkvm
+      #     if-no-files-found: error
+
+
 
