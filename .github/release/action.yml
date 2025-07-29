@@ -15,9 +15,6 @@ inputs:
     description: "GitHub token with release upload permissions"
     required: true
 
-env:
-  tar_file: ${{ inputs.project }}.tar.gz
-
 runs:
   using: "composite"
   steps:
@@ -25,7 +22,7 @@ runs:
     - name: Create tar.gz archive
       shell: bash
       run: |
-        tar czf ${{ env.tar_file }}.tar.gz ${{ inputs.artifact }}
+        tar czf ${{ inputs.project }}.tar.gz ${{ inputs.artifact }}
         
     - name: Sanitize branch and compute tags
       shell: bash
@@ -49,7 +46,7 @@ runs:
         name: ${{ steps.tags.outputs.tag_date_name }}
         body: ""
         fail_on_unmatched_files: false
-        files: ${{ inputs.artifact }}
+        files: ${{ inputs.project }}.tar.gz
         token: ${{ inputs.token }}
 
     - name: Create or update 'latest' tag
@@ -60,5 +57,5 @@ runs:
         name: ${{ steps.tags.outputs.tag_latest_name }}
         body: ""
         fail_on_unmatched_files: false
-        files: ${{ inputs.artifact }}
+        files: ${{ inputs.project }}.tar.gz
         token: ${{ inputs.token }}
