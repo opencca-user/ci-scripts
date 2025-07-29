@@ -1,0 +1,63 @@
+name: "Upload Release"
+description: "Creates a 'latest' and timestamped GitHub release for an artifact"
+
+inputs:
+  project:
+    description: "Project name for tag prefix (e.g. kvmtool)"
+    required: true
+  branch:
+    description: "Branch name (e.g. opencca/main)"
+    required: true
+  artifact:
+    description: "Path to artifact or artifact folder"
+    required: true
+  token:
+    description: "GitHub token with release upload permissions"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Create tar.gz archive
+      shell: bash
+      run: |
+        echo "${{ inputs.artifact }}" > artifact_paths.txt
+        tar czf ${{ inputs.project }}.tar.gz $(cat artifact_paths.txt)
+        
+    - name: Sanitize branch and compute tags
+      shell: bash
+      id: tags 
+      run: |
+        branch_name="${{ inputs.branch }}"
+        sanitized="${branch_name}"
+        sanitized="${branch_name//\//-}"
+        date_tag="$(date +%Y%m%d%H%M%S)"
+        prefix="${{ inputs.project }}/snapshot/${sanitized}"
+        name="${{ inputs.project }}/snapshot/${branch_name}"
+        echo "tag_date=${prefix}/${date_tag}" >> $GITHUB_OUTPUT
+        echo "tag_latest=${prefix}/latest" >> $GITHUB_OUTPUT
+        echo "tag_date_name=${name}/${date_tag}" >> $GITHUB_OUTPUT
+        echo "tag_latest_name=${name}/latest" >> $GITHUB_OUTPUT
+    - name: Create dated release
+      uses: softprops/action-gh-release@v2
+      with:
+        repository: opencca/opencca-releases
+        tag_name: ${{ steps.tags.outputs.tag_date }}
+        name: ${{ steps.tags.outputs.tag_date_name }}
+        body: ""
+        fail_on_unmatched_files: false
+        files: ${{ inputs.project }}.tar.gz
+        token: ${{ inputs.token }}
+
+
+    - name: Create or update 'latest' tag
+      uses: softprops/action-gh-release@v2
+      with:
+        repository: opencca/opencca-releases
+        tag_name: ${{ steps.tags.outputs.tag_latest }}
+        name: ${{ steps.tags.outputs.tag_latest_name }}
+        body: ""
+        fail_on_unmatched_files: false
+        files: ${{ inputs.project }}.tar.gz
+        token: ${{ inputs.token }}

@@ -1,0 +1,74 @@
+name: release-firmware
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        default: opencca/main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.branch }}
+  cancel-in-progress: true
+
+env:
+  CI_REPO: https://github.com/opencca/ci-scripts
+  CI_RUN_SCRIPT: run-ci.sh
+  CI_BUILD_SCRIPT: build-firmware2.sh
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout uboot
+        uses: actions/checkout@v4
+        with:
+          repository: opencca/u-boot
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+          clean: true
+          path: u-boot
+
+      - name: Checkout tfa
+        uses: actions/checkout@v4
+        with:
+          repository: opencca/arm-trusted-firmware
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+          clean: true
+          path: trusted-firmware-a
+
+      - name: Checkout rmm
+        uses: actions/checkout@v4
+        with:
+          repository: opencca/tf-rmm
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+          clean: true
+          path: tf-rmm
+
+      - name: Run build script
+        run: |
+          rm -rf .ci || true
+          git clone --depth 1 "$CI_REPO" .ci
+          cd .ci
+          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
+    
+
+      - name: Upload snapshot release
+        uses: opencca/ci-scripts/.github/release@opencca/main
+        with:
+          project: firmware
+          branch: ${{ inputs.branch }}
+          artifact: |
+            snapshot/u-boot-rockchip.bin
+            snapshot/u-boot-rockchip-spi.bin
+            snapshot/idbloader.img
+            snapshot/u-boot.itb
+            snapshot/bl31.elf
+            snapshot/tf-rmm.elf
+            snapshot/rk3588_ddr_*.bin
+          token: ${{ secrets.RELEASES_REPO_TOKEN }}

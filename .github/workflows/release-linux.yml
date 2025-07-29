@@ -1,14 +1,14 @@
-name: kvmtool build
+name: linux release
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       branch:
         required: true
         type: string
-    secrets:
-      RELEASES_REPO_TOKEN:
-        required: true
+
+permissions:
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.branch }}
@@ -17,9 +17,7 @@ concurrency:
 env:
   CI_REPO: https://github.com/opencca/ci-scripts
   CI_RUN_SCRIPT: run-ci.sh
-  CI_BUILD_SCRIPT: build-kvmtool.sh
-  create_snapshot: true
-  create_release: true
+  CI_BUILD_SCRIPT: build-linux.sh
 
 jobs:
   build-and-push:
@@ -29,12 +27,11 @@ jobs:
       - name: Checkout caller repo
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository }}
+          repository: opencca/linux
           ref: ${{ inputs.branch }}
           submodules: recursive
           clean: true
-          path: kvmtool
-        
+          path: linux
 
       - name: Run build script
         run: |
@@ -43,18 +40,14 @@ jobs:
           cd .ci
           ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
     
-      - name: Upload snapshot
-        if: ${{ env.create_snapshot }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: kvmtool-snapshot
-          path: snapshot/lkvm
-          if-no-files-found: error
-
       - name: Upload snapshot release
         uses: opencca/ci-scripts/.github/release@opencca/main
         with:
-          project: kvmtool
-          branch: ${{ github.ref_name }}
-          artifact: snapshot/lkvm
+          project: linux
+          branch: ${{ inputs.branch }}
+          artifact: |
+            snapshot/debian/*.deb
+            snapshot/Image
+            snapshot/kernel-rk3588-rock-5b.dtb
+            snapshot/rk3588-kernel-config
           token: ${{ secrets.RELEASES_REPO_TOKEN }}
