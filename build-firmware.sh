@@ -69,7 +69,7 @@ export ENABLE_OPENCCA_PERF=1
 
 ./firmware_opencca.mk build
 
-COMMIT_FILE=$SNAPSHOT/commits.txt
+COMMIT_FILE=$SNAPSHOT_DIR/commits.txt
 commit_hash $RMM_DIR "tf-rmm" >> $COMMIT_FILE
 commit_hash $TFA_DIR "tf-rmm" >> $COMMIT_FILE
 commit_hash $UBOOT_DIR "uboot" >> $COMMIT_FILE
