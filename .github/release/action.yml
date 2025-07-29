@@ -15,9 +15,18 @@ inputs:
     description: "GitHub token with release upload permissions"
     required: true
 
+env:
+  tar_file: ${{ inputs.project }}.tar.gz
+
 runs:
   using: "composite"
   steps:
+
+    - name: Create tar.gz archive
+      shell: bash
+      run: |
+        tar czf ${{ env.tar_file }}.tar.gz ${{ inputs.artifact }}
+        
     - name: Sanitize branch and compute tags
       shell: bash
       id: tags 
