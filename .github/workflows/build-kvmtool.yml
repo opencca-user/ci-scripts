@@ -15,6 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  CI_REPO: https://github.com/opencca/ci-scripts
+  CI_RUN_SCRIPT: run-ci.sh
+  CI_BUILD_SCRIPT: build-kvmtool.sh
   create_snapshot: true
   create_release: true
 
