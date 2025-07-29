@@ -1,0 +1,53 @@
+name: release-firmware
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+      type: string
+      default: opencca/main
+      branch-tfa:
+        type: string
+        default: ""
+      branch-rmm:
+        type: string
+        default: ""
+      branch-uboot:
+        type: string
+        default: ""
+      release:
+        type: bool
+        default: false
+      log-level:
+        default: 50
+        type: integer
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.branch }}
+  cancel-in-progress: true
+
+env:
+  CI_REPO: https://github.com/opencca/ci-scripts
+  CI_RUN_SCRIPT: run-ci.sh
+  CI_BUILD_SCRIPT: release-firmware.sh
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+    steps:
+      - name: Run build script
+        env:
+          BRANCH_NAME: ${{ inputs.branch }}
+          BRANCH_TFA: ${{ inputs.branch-tfa }}
+          BRANCH_RMM: ${{ inputs.branch-rmm }}
+          BRANCH_UBOOT: ${{ inputs.branch-uboot }}
+          RELEASE_FLAG: ${{ inputs.release }}
+          LOG_LEVEL: ${{ inputs.log-level }}
+        run: |
+          rm -rf .ci || true
+          git clone --depth 1 "$CI_REPO" .ci
+          cd .ci
+          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
