@@ -23,7 +23,7 @@ jobs:
   build-and-push:
     runs-on: self-hosted
     steps:
-      - name: Checkout uboot
+      - name: Checkout kvmtool
         uses: actions/checkout@v4
         with:
           repository: opencca/kvmtool
