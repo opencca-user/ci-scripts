@@ -13,6 +13,7 @@ cd $SCRIPT_DIR
 PROJECT_ROOT=/opencca
 SNAPSHOT_DIR=$PROJECT_ROOT/snapshot
 BUILD_DIR=$PROJECT_ROOT/opencca-build
+UBOOT_DIR=$PROJECT_ROOT/uboot
 
 clone_repo() {
     local dir="$1"
@@ -29,6 +30,14 @@ clone_repo() {
     fi
 }
 
+commit_hash() {
+    local dir="$1"
+    local name="$2"
+
+    cd $dir
+    commit=$(git rev-parse HEAD)
+    echo "$name: $commit"
+}
 
 #
 # XXX: We are building u-boot with a openca/main version of tfa and rmm
@@ -59,6 +68,11 @@ export DEBUG=1
 export ENABLE_OPENCCA_PERF=1
 
 ./firmware_opencca.mk build
+
+COMMIT_FILE=$SNAPSHOT/commits.txt
+commit_hash $RMM_DIR "tf-rmm" >> $COMMIT_FILE
+commit_hash $TFA_DIR "tf-rmm" >> $COMMIT_FILE
+commit_hash $UBOOT_DIR "uboot" >> $COMMIT_FILE
 
 ls -al $SNAPSHOT_DIR
 
