@@ -10,7 +10,10 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.branch }}
   cancel-in-progress: true
-
+  
+permissions:
+  contents: write
+  
 jobs:
   prepare:
     runs-on: self-hosted
