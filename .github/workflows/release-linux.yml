@@ -1,14 +1,14 @@
-name: linux release
+name: release-linux
+
+permissions:
+  contents: write
 
 on:
   workflow_dispatch:
     inputs:
       branch:
-        required: true
         type: string
-
-permissions:
-  contents: write
+        default: opencca/next
 
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.branch }}
@@ -22,9 +22,8 @@ env:
 jobs:
   build-and-push:
     runs-on: self-hosted
-
     steps:
-      - name: Checkout caller repo
+      - name: Checkout linux
         uses: actions/checkout@v4
         with:
           repository: opencca/linux
@@ -39,13 +38,21 @@ jobs:
           git clone --depth 1 "$CI_REPO" .ci
           cd .ci
           ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
-    
+          
+      - name: Mark commit hashes
+        uses: opencca/ci-scripts/.github/actions/commit-hash@opencca/main
+        with:
+          repos: |
+            ./linux linux
+          output: snapshot/commits.txt
+
       - name: Upload snapshot release
         uses: opencca/ci-scripts/.github/release@opencca/main
         with:
           project: linux
           branch: ${{ inputs.branch }}
           artifact: |
+            snapshot/commits.txt
             snapshot/debian/*.deb
             snapshot/Image
             snapshot/kernel-rk3588-rock-5b.dtb
