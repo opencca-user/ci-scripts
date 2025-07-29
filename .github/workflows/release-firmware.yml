@@ -9,21 +9,6 @@ on:
       branch:
       type: string
       default: opencca/main
-      branch-tfa:
-        type: string
-        default: ""
-      branch-rmm:
-        type: string
-        default: ""
-      branch-uboot:
-        type: string
-        default: ""
-      debug:
-        type: bool
-        default: true
-      log-level:
-        default: 50
-        type: integer
 
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.branch }}
@@ -32,22 +17,58 @@ concurrency:
 env:
   CI_REPO: https://github.com/opencca/ci-scripts
   CI_RUN_SCRIPT: run-ci.sh
-  CI_BUILD_SCRIPT: release-firmware.sh
+  CI_BUILD_SCRIPT: build-firmware.sh
 
 jobs:
   build-and-push:
     runs-on: self-hosted
     steps:
+      - name: Checkout uboot
+        uses: actions/checkout@v4
+        with:
+          repository: opencca/u-boot
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+          clean: true
+          path: u-boot
+
+      - name: Checkout tfa
+        uses: actions/checkout@v4
+        with:
+          repository: opencca/arm-trusted-firmware
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+          clean: true
+          path: trusted-firmware-a
+
+      - name: Checkout rmm
+        uses: actions/checkout@v4
+        with:
+          repository: opencca/tf-rmm
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+          clean: true
+          path: tf-rmm
+
       - name: Run build script
-        env:
-          BRANCH_NAME: ${{ inputs.branch }}
-          BRANCH_TFA: ${{ inputs.branch-tfa }}
-          BRANCH_RMM: ${{ inputs.branch-rmm }}
-          BRANCH_UBOOT: ${{ inputs.branch-uboot }}
-          DEBUG_FLAG: ${{ inputs.debug }}
-          LOG_LEVEL: ${{ inputs.log-level }}
         run: |
           rm -rf .ci || true
           git clone --depth 1 "$CI_REPO" .ci
           cd .ci
           ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
+    
+
+      - name: Upload snapshot release
+        uses: opencca/ci-scripts/.github/release@opencca/main
+        with:
+          project: firmware
+          branch: ${{ inputs.branch }}
+          artifact: |
+            snapshot/u-boot-rockchip.bin
+            snapshot/u-boot-rockchip-spi.bin
+            snapshot/idbloader.img
+            snapshot/u-boot.itb
+            snapshot/bl31.elf
+            snapshot/tf-rmm.elf
+            snapshot/rk3588_ddr_*.bin
+          token: ${{ secrets.RELEASES_REPO_TOKEN }}
