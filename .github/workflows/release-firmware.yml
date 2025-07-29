@@ -18,9 +18,9 @@ on:
       branch-uboot:
         type: string
         default: ""
-      release:
+      debug:
         type: bool
-        default: false
+        default: true
       log-level:
         default: 50
         type: integer
@@ -44,7 +44,7 @@ jobs:
           BRANCH_TFA: ${{ inputs.branch-tfa }}
           BRANCH_RMM: ${{ inputs.branch-rmm }}
           BRANCH_UBOOT: ${{ inputs.branch-uboot }}
-          RELEASE_FLAG: ${{ inputs.release }}
+          DEBUG_FLAG: ${{ inputs.debug }}
           LOG_LEVEL: ${{ inputs.log-level }}
         run: |
           rm -rf .ci || true
