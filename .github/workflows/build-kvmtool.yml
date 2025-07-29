@@ -51,14 +51,10 @@ jobs:
           path: snapshot/lkvm
           if-no-files-found: error
 
-      - name: Upload snapshot release to releases repo
-        uses: softprops/action-gh-release@v2
+      - name: Upload snapshot release
+        uses: opencca/ci-scripts/.github/release@opencca/main
         with:
-          repository: opencca/opencca-releases
-          tag_name: kvmtool/snapshot/${{ inputs.branch }}/latest
-          name: kvmtool/snapshot/${{ inputs.branch }}/latest
-          body: ""
-          fail_on_unmatched_files: true
+          project: kvmtool
+          branch: ${{ github.ref_name }}
+          artifact: snapshot/lkvm
           token: ${{ secrets.RELEASES_REPO_TOKEN }}
-          files: |
-            snapshot/lkvm
