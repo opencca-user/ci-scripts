@@ -1,0 +1,57 @@
+name: "Upload Release"
+description: "Creates a 'latest' and timestamped GitHub release for an artifact"
+
+inputs:
+  project:
+    description: "Project name for tag prefix (e.g. kvmtool)"
+    required: true
+  branch:
+    description: "Branch name (e.g. opencca/main)"
+    required: true
+  artifact:
+    description: "Path to artifact or artifact folder"
+    required: true
+  token:
+    description: "GitHub token with release upload permissions"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Sanitize branch name
+      id: sanitize
+      shell: bash
+      run: |
+        sanitized="${{ inputs.branch//\//- }}"
+        echo "sanitized_branch=$sanitized" >> $GITHUB_OUTPUT
+
+    - name: Set tag names
+      id: tags
+      shell: bash
+      run: |
+        now=$(date -u +%Y%m%d-%H%M%S)
+        prefix="${{ inputs.project }}/snapshot/${{ steps.sanitize.outputs.sanitized_branch }}"
+        echo "tag_date=${prefix}/${now}" >> $GITHUB_OUTPUT
+        echo "tag_latest=${prefix}/latest" >> $GITHUB_OUTPUT
+
+    - name: Create dated release
+      uses: softprops/action-gh-release@v2
+      with:
+        repository: opencca/opencca-releases
+        tag_name: ${{ steps.tags.outputs.tag_date }}
+        name: ${{ steps.tags.outputs.tag_date }}
+        body: ""
+        fail_on_unmatched_files: false
+        files: ${{ inputs.artifact }}
+        token: ${{ inputs.token }}
+
+    - name: Create or update 'latest' tag
+      uses: softprops/action-gh-release@v2
+      with:
+        repository: opencca/opencca-releases
+        tag_name: ${{ steps.tags.outputs.tag_latest }}
+        name: ${{ steps.tags.outputs.tag_latest }}
+        body: ""
+        fail_on_unmatched_files: false
+        files: ${{ inputs.artifact }}
+        token: ${{ inputs.token }}
