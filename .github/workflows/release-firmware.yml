@@ -56,7 +56,15 @@ jobs:
           git clone --depth 1 "$CI_REPO" .ci
           cd .ci
           ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
-    
+          
+      - name: Mark commit hashes
+        uses: opencca/ci-scripts/.github/actions/commit-hash@opencca/main
+        with:
+          repos: |
+            ./tf-rmm tf-rmm
+            ./trusted-firmware-a trusted-firmware-a
+            ./u-boot u-boot
+          output: snapshot/commits.txt
 
       - name: Upload snapshot release
         uses: opencca/ci-scripts/.github/release@opencca/main
@@ -64,6 +72,7 @@ jobs:
           project: firmware
           branch: ${{ inputs.branch }}
           artifact: |
+            snapshot/commits.txt
             snapshot/u-boot-rockchip.bin
             snapshot/u-boot-rockchip-spi.bin
             snapshot/idbloader.img
