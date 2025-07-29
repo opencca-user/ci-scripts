@@ -67,10 +67,11 @@ jobs:
           output: snapshot/commits.txt
 
       - name: Upload snapshot release
-        uses: opencca/ci-scripts/.github/release@opencca/main
+        uses: opencca/ci-scripts/.github/actions/release@opencca/main
         with:
           project: firmware
           branch: ${{ inputs.branch }}
+          lsdir: snapshot/
           artifact: |
             snapshot/commits.txt
             snapshot/u-boot-rockchip.bin
