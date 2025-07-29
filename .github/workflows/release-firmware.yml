@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-      type: string
-      default: opencca/main
+        type: string
+        default: opencca/main
 
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.branch }}
