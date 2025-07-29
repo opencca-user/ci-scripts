@@ -54,6 +54,10 @@ clone_repo "$TFA_DIR" "$TFA_REPO" "$TFA_REPO_BRANCH"
 #
 cd $BUILD_DIR/buildconf
 
+export LOG=50
+export DEBUG=1
+export ENABLE_OPENCCA_PERF=1
+
 ./firmware_opencca.mk build
 
 ls -al $SNAPSHOT_DIR

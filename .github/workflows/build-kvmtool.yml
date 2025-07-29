@@ -10,12 +10,13 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.branch }}
   cancel-in-progress: true
-  
-permissions:
-  contents: write
-  
+
+env:
+  create_snapshot: true
+  create_release: true
+
 jobs:
-  prepare:
+  build-and-push:
     runs-on: self-hosted
 
     steps:
@@ -27,15 +28,31 @@ jobs:
           submodules: recursive
           clean: true
           path: kvmtool
-          
-  build:
-    needs: prepare
-    uses: ./.github/workflows/build-and-snapshot.yml
-    with:
-      build_script: build-kvmtool.sh
-      artifact_name: kvmtool-snapshot
-      artifact_path: snapshot/lkvm
-      upload_artifact: true
-      release_artifact: true
-      release_name: kvmtool
+        
 
+      - name: Run build script
+        run: |
+          rm -rf .ci || true
+          git clone --depth 1 "$CI_REPO" .ci
+          cd .ci
+          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
+    
+      - name: Upload snapshot
+        if: ${{ env.create_snapshot }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: kvmtool-snapshot
+          path: snapshot/lkvm
+          if-no-files-found: error
+
+      - name: Upload snapshot release to releases repo
+        uses: softprops/action-gh-release@v2
+        with:
+          repository: opencca/opencca-releases
+          tag_name: kvmtool/snapshot/${{ inputs.branch }}/latest
+          name: kvmtool/snapshot/${{ inputs.branch }}/latest
+          body: ""
+          fail_on_unmatched_files: true
+          token: ${{ secrets.RELEASES_REPO_TOKEN }}
+          files: |
+            snapshot/lkvm

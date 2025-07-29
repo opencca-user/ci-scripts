@@ -12,14 +12,10 @@ cd $SCRIPT_DIR
 PROJECT_ROOT=/opencca
 SNAPSHOT_DIR=$PROJECT_ROOT/snapshot
 BUILD_DIR=$PROJECT_ROOT/opencca-build
-DEBIAN_OUT=$SNAPSHOT_DIR/debian
-
-rm -r $DEBIAN_OUT || true
-mkdir -p $DEBIAN_OUT
 
 cd $BUILD_DIR/buildconf
 
-./debos_rootfs_host.mk build DEBIAN_RELEASE_DIR=$DEBIAN_OUT
+sudo ./debos_rootfs_host.mk build
 
 ls -al $SNAPSHOT_DIR
 
