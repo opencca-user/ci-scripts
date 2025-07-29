@@ -1,22 +1,21 @@
-name: release-linux
+name: linux release
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        required: true
+        type: string
 
 permissions:
   contents: write
-
-on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        type: string
-        default: opencca/main
 
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.branch }}
   cancel-in-progress: true
 
 env:
-  LINUX_REPO: https://github.com/opencca/linux.git
-  CI_REPO: https://github.com/opencca/ci-scripts.git
+  CI_REPO: https://github.com/opencca/ci-scripts
   CI_RUN_SCRIPT: run-ci.sh
   CI_BUILD_SCRIPT: build-linux.sh
 
@@ -25,21 +24,22 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Clone Linux repo
-        run: |
-          rm -rf linux || true
-          git clone --depth 1 --branch "${{ inputs.branch }}" --recurse-submodules "$LINUX_REPO" linux
+      - name: Checkout caller repo
+        uses: actions/checkout@v4
+        with:
+          repository: opencca/linux
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+          clean: true
+          path: linux
 
-      - name: Clone CI scripts
+      - name: Run build script
         run: |
           rm -rf .ci || true
           git clone --depth 1 "$CI_REPO" .ci
-
-      - name: Run Linux build script
-        run: |
           cd .ci
-          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE/" ./"$CI_BUILD_SCRIPT"
-          
+          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
+    
       - name: Upload snapshot release
         uses: opencca/ci-scripts/.github/release@opencca/main
         with:
