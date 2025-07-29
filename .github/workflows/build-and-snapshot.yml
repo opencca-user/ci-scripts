@@ -85,8 +85,7 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             ${{ inputs.artifact_path }}
-        env:
-          token: ${{ secrets.RELEASES_REPO_TOKEN }}
+          token: ${{ secrets.RELEASES_REPO_TOKEN }} 
 
       - name: Update 'latest' tag in releases repo
         if: ${{ inputs.release_artifact == true }}
