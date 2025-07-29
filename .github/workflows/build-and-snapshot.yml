@@ -68,8 +68,16 @@ jobs:
           SANITIZED_BRANCH="${BRANCH_NAME//\//-}"
           TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
 
+
+
           TAG_NAME="${{ inputs.release_name }}/snapshot/${SANITIZED_BRANCH}/${TIMESTAMP}"
           LATEST_TAG="${{ inputs.release_name }}/snapshot/${SANITIZED_BRANCH}/latest"
+
+          echo $BRANCH_NAME
+          echo $SANITIZED_BRANCH
+          echo $TIMESTAMP
+          echo $TAG_NAME
+          echo $LATEST_TAG
 
           echo "RELEASE_TAG=$TAG_NAME" >> $GITHUB_ENV
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
