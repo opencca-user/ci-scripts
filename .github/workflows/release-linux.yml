@@ -55,6 +55,5 @@ jobs:
             snapshot/commits.txt
             snapshot/debian/*.deb
             snapshot/Image
-            snapshot/kernel-rk3588-rock-5b.dtb
             snapshot/rk3588-kernel-config
           token: ${{ secrets.RELEASES_REPO_TOKEN }}
