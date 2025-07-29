@@ -22,7 +22,8 @@ runs:
     - name: Create tar.gz archive
       shell: bash
       run: |
-        tar czf ${{ inputs.project }}.tar.gz ${{ inputs.artifact }}
+        echo "${{ inputs.artifact }}" > artifact_paths.txt
+        tar czf ${{ inputs.project }}.tar.gz $(cat artifact_paths.txt)
         
     - name: Sanitize branch and compute tags
       shell: bash
@@ -48,6 +49,7 @@ runs:
         fail_on_unmatched_files: false
         files: ${{ inputs.project }}.tar.gz
         token: ${{ inputs.token }}
+
 
     - name: Create or update 'latest' tag
       uses: softprops/action-gh-release@v2
