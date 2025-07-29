@@ -20,6 +20,7 @@ runs:
   steps:
     - name: Sanitize branch and compute tags
       shell: bash
+      id: tags 
       run: |
         sanitized="${{ inputs.branch }}"
         sanitized="${sanitized//\//-}"
