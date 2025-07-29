@@ -32,10 +32,10 @@ runs:
         sanitized="${branch_name}"
         sanitized="${branch_name//\//-}"
         date_tag="$(date +%Y%m%d%H%M%S)"
-        prefix="${{ inputs.project }}-snapshot-${sanitized}"
+        prefix="${{ inputs.project }}/snapshot/${sanitized}"
         name="${{ inputs.project }}/snapshot/${branch_name}"
-        echo "tag_date=${prefix}-${date_tag}" >> $GITHUB_OUTPUT
-        echo "tag_latest=${prefix}-latest" >> $GITHUB_OUTPUT
+        echo "tag_date=${prefix}/${date_tag}" >> $GITHUB_OUTPUT
+        echo "tag_latest=${prefix}/latest" >> $GITHUB_OUTPUT
         echo "tag_date_name=${name}/${date_tag}" >> $GITHUB_OUTPUT
         echo "tag_latest_name=${name}/latest" >> $GITHUB_OUTPUT
     - name: Create dated release
