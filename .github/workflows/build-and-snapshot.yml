@@ -46,6 +46,9 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: Check if token is set
+        run: |
+          if [ -z "${{ secrets.RELEASES_REPO_TOKEN }}" ]; then echo "Missing token"; exit 1; else echo "Token is set"; fi
       - name: Run build script
         run: |
           rm -rf .ci || true
