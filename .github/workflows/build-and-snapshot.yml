@@ -90,7 +90,7 @@ jobs:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TAG }}
           body: ""
-          fail_on_unmatched_files: true
+          fail_on_unmatched_files: false
           token: ${{ secrets.RELEASES_REPO_TOKEN }}
           files: |
             ${{ inputs.artifact_path }}
