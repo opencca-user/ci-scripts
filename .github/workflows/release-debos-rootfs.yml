@@ -1,0 +1,59 @@
+name: release-debian-rootfs
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        default: opencca/main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.branch }}
+  cancel-in-progress: true
+
+env:
+  CI_REPO: https://github.com/opencca/ci-scripts
+  CI_RUN_SCRIPT: run-ci.sh
+  CI_BUILD_SCRIPT: build-debos-rootfs.sh
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          repository: opencca/debian-image-recipes
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+          clean: true
+          path: debian-image-recipes
+
+      - name: Run build script
+        run: |
+          rm -rf .ci || true
+          git clone --depth 1 "$CI_REPO" .ci
+          cd .ci
+          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
+          
+      - name: Mark commit hashes
+        uses: opencca/ci-scripts/.github/actions/commit-hash@opencca/main
+        with:
+          repos: |
+            ./debian-image-recipes debian-image-recipes
+          output: snapshot/commits.txt
+
+      # - name: Upload snapshot release
+      #   uses: opencca/ci-scripts/.github/release@opencca/main
+      #   with:
+      #     project: linux
+      #     branch: ${{ inputs.branch }}
+      #     artifact: |
+      #       snapshot/commits.txt
+      #       snapshot/debian/*.deb
+      #       snapshot/Image
+      #       snapshot/rk3588-kernel-config
+      #     token: ${{ secrets.RELEASES_REPO_TOKEN }}
