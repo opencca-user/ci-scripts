@@ -1,0 +1,58 @@
+name: release-kvmtool
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        default: opencca/main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.branch }}
+  cancel-in-progress: true
+
+env:
+  CI_REPO: https://github.com/opencca/ci-scripts
+  CI_RUN_SCRIPT: run-ci.sh
+  CI_BUILD_SCRIPT: build_kvmtool.sh
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout uboot
+        uses: actions/checkout@v4
+        with:
+          repository: opencca/kvmtool
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+          clean: true
+          path: kvmtool
+
+      - name: Run build script
+        run: |
+          rm -rf .ci || true
+          git clone --depth 1 "$CI_REPO" .ci
+          cd .ci
+          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
+          
+      - name: Mark commit hashes
+        uses: opencca/ci-scripts/.github/actions/commit-hash@opencca/main
+        with:
+          repos: |
+            ./kvmtool kvmtool
+          output: snapshot/commits.txt
+
+      - name: Upload snapshot release
+        uses: opencca/ci-scripts/.github/actions/release@opencca/main
+        with:
+          project: kvmtool
+          branch: ${{ inputs.branch }}
+          lsdir: snapshot/
+          artifact: |
+            snapshot/commits.txt
+            snapshot/lkvm
+          token: ${{ secrets.RELEASES_REPO_TOKEN }}
