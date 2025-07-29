@@ -24,16 +24,19 @@ runs:
       run: |
         sanitized="${{ inputs.branch }}"
         sanitized="${sanitized//\//-}"
-        date_tag="$(date -u +%Y%m%d-%H%M%S)"
-        prefix="${{ inputs.project }}/snapshot/${sanitized}"
-        echo "tag_date=${prefix}/${date_tag}" >> $GITHUB_OUTPUT
-        echo "tag_latest=${prefix}/latest" >> $GITHUB_OUTPUT
+        date_tag="$(date +%Y%m%d%H%M%S)"
+        prefix="${{ inputs.project }}-snapshot-${sanitized}"
+        name="${{ inputs.project }}/snapshot/${sanitized}"
+        echo "tag_date=${prefix}-${date_tag}" >> $GITHUB_OUTPUT
+        echo "tag_latest=${prefix}-latest" >> $GITHUB_OUTPUT
+        echo "tag_date_name=${name}/${date_tag}" >> $GITHUB_OUTPUT
+        echo "tag_latest_name=${name}/latest" >> $GITHUB_OUTPUT
     - name: Create dated release
       uses: softprops/action-gh-release@v2
       with:
         repository: opencca/opencca-releases
         tag_name: ${{ steps.tags.outputs.tag_date }}
-        name: ${{ steps.tags.outputs.tag_date }}
+        name: ${{ steps.tags.outputs.tag_date_name }}
         body: ""
         fail_on_unmatched_files: false
         files: ${{ inputs.artifact }}
@@ -44,7 +47,7 @@ runs:
       with:
         repository: opencca/opencca-releases
         tag_name: ${{ steps.tags.outputs.tag_latest }}
-        name: ${{ steps.tags.outputs.tag_latest }}
+        name: ${{ steps.tags.outputs.tag_latest_name }}
         body: ""
         fail_on_unmatched_files: false
         files: ${{ inputs.artifact }}
