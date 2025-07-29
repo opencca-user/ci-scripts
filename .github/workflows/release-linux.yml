@@ -1,0 +1,53 @@
+name: release-linux
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        default: opencca/main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.branch }}
+  cancel-in-progress: true
+
+env:
+  LINUX_REPO: https://github.com/opencca/linux.git
+  CI_REPO: https://github.com/opencca/ci-scripts.git
+  CI_RUN_SCRIPT: run-ci.sh
+  CI_BUILD_SCRIPT: build-linux.sh
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+
+    steps:
+      - name: Clone Linux repo
+        run: |
+          rm -rf linux || true
+          git clone --depth 1 --branch "${{ inputs.branch }}" --recurse-submodules "$LINUX_REPO" linux
+
+      - name: Clone CI scripts
+        run: |
+          rm -rf .ci || true
+          git clone --depth 1 "$CI_REPO" .ci
+
+      - name: Run Linux build script
+        run: |
+          cd .ci
+          ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE/" ./"$CI_BUILD_SCRIPT"
+          
+      - name: Upload snapshot release
+        uses: opencca/ci-scripts/.github/release@opencca/main
+        with:
+          project: linux
+          branch: ${{ inputs.branch }}
+          artifact: |
+            snapshot/debian/*.deb
+            snapshot/Image
+            snapshot/kernel-rk3588-rock-5b.dtb
+            snapshot/rk3588-kernel-config
+          token: ${{ secrets.RELEASES_REPO_TOKEN }}
