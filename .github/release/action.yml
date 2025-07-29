@@ -26,7 +26,7 @@ runs:
         sanitized="${sanitized//\//-}"
         date_tag="$(date +%Y%m%d%H%M%S)"
         prefix="${{ inputs.project }}-snapshot-${sanitized}"
-        name="${{ inputs.project }}/snapshot/${sanitized}"
+        name="${{ inputs.project }}/snapshot/${inputs.branch}"
         echo "tag_date=${prefix}-${date_tag}" >> $GITHUB_OUTPUT
         echo "tag_latest=${prefix}-latest" >> $GITHUB_OUTPUT
         echo "tag_date_name=${name}/${date_tag}" >> $GITHUB_OUTPUT
