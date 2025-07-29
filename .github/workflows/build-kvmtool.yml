@@ -27,14 +27,16 @@ jobs:
           submodules: recursive
           clean: true
           path: kvmtool
+          
+      - name: Build and snapshot
+        uses: ./.github/actions/build-and-snapshot
+        with:
+          build_script: build-kvmtool.sh
+          artifact_name: kvmtool-snapshot
+          artifact_path: snapshot/lkvm
+          upload_artifact: true
+          release_artifact: true
+          release_name: kvmtool
+        env:
+          RELEASES_REPO_TOKEN: ${{ secrets.RELEASES_REPO_TOKEN }}
 
-  build-artifact:
-    uses: ./.github/workflows/build-and-snapshot.yml
-    needs: prepare
-    with:
-      build_script: build-kvmtool.sh
-      artifact_name: kvmtool-snapshot
-      artifact_path: snapshot/lkvm
-      upload_artifact: true
-      release_artifact: true
-      release_name: kvmtool
