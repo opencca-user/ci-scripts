@@ -18,21 +18,17 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Sanitize branch name
-      id: sanitize
-      shell: bash
-      run: |
-        sanitized="${{ inputs.branch//\//- }}"
-        echo "sanitized_branch=$sanitized" >> $GITHUB_OUTPUT
+      - name: Sanitize branch and compute tags
+        id: taggen
+        shell: bash
+        run: |
+          sanitized="${{ inputs.branch }}"
+          sanitized="${sanitized//\//-}"
+          date_tag="$(date -u +%Y%m%d-%H%M%S)"
+          prefix="${{ inputs.project }}/snapshot/${sanitized}"
+          echo "tag_date=${prefix}/${date_tag}" >> $GITHUB_OUTPUT
+          echo "tag_latest=${prefix}/latest" >> $GITHUB_OUTPUT
 
-    - name: Set tag names
-      id: tags
-      shell: bash
-      run: |
-        now=$(date -u +%Y%m%d-%H%M%S)
-        prefix="${{ inputs.project }}/snapshot/${{ steps.sanitize.outputs.sanitized_branch }}"
-        echo "tag_date=${prefix}/${now}" >> $GITHUB_OUTPUT
-        echo "tag_latest=${prefix}/latest" >> $GITHUB_OUTPUT
 
     - name: Create dated release
       uses: softprops/action-gh-release@v2
