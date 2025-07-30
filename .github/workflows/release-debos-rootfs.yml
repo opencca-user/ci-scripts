@@ -9,7 +9,9 @@ on:
       branch:
         type: string
         default: opencca/main
-
+      clean:
+        type: boolean
+        default: false
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.branch }}
   cancel-in-progress: true
@@ -29,7 +31,7 @@ jobs:
           repository: opencca/debian-image-recipes
           ref: ${{ inputs.branch }}
           submodules: recursive
-          clean: false
+          clean:  ${{ inputs.clean }}
           path: debian-image-recipes
 
       - name: Run build script
