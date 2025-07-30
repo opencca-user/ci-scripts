@@ -17,7 +17,7 @@ concurrency:
 env:
   CI_REPO: https://github.com/opencca/ci-scripts
   CI_RUN_SCRIPT: run-ci.sh
-  CI_BUILD_SCRIPT: build_firmware2.sh
+  CI_BUILD_SCRIPT: build-firmware.sh
 
 jobs:
   build-and-push:

@@ -30,6 +30,12 @@ clone_repo() {
     fi
 }
 
+
+
+#
+# XXX: We are building u-boot with a openca/main version of tfa and rmm
+#      so we get a functional artifact
+#
 TFA_REPO=https://github.com/opencca/opencca-assets.git
 TFA_REPO_BRANCH=opencca/main
 TFA_DIR=$PROJECT_ROOT/opencca-assets
@@ -46,7 +52,6 @@ export ENABLE_OPENCCA_PERF=1
 
 ./firmware_opencca.mk build
 
+
+
 ls -al $SNAPSHOT_DIR
-
-
-
