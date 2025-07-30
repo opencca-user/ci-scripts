@@ -51,15 +51,13 @@ jobs:
 ```
 
 **CI Jobs:**
-| Name          | Repository                                                                        | Workflow File                                              | Job                                                                                                                                                                                                    |
-| ------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Build Linux   | [`opencca/linux`](https://github.com/opencca/linux)                               | [`build-linux.yml`](.github/workflows/build-linux.yml)     | [![opencca-build](https://github.com/opencca/linux/actions/workflows/opencca-build.yml/badge.svg)](https://github.com/opencca/linux/actions/workflows/opencca-build.yml)                               |
-| Build U-Boot   | [`opencca/u-boot`](https://github.com/opencca/u-boot)                             | [`build-u-boot.yml`](.github/workflows/build-u-boot.yml)   | [![opencca-build](https://github.com/opencca/u-boot/actions/workflows/opencca-build.yml/badge.svg)](https://github.com/opencca/u-boot/actions/workflows/opencca-build.yml)                             |
-| Build TF-RMM  | [`opencca/tf-rmm`](https://github.com/opencca/tf-rmm)                             | [`build-tf-rmm.yml`](.github/workflows/build-tf-rmm.yml)   | [![opencca-build](https://github.com/opencca/tf-rmm/actions/workflows/opencca-build.yml/badge.svg)](https://github.com/opencca/tf-rmm/actions/workflows/opencca-build.yml)                             |
-| Build TFA     | [`opencca/arm-trusted-firmware`](https://github.com/opencca/arm-trusted-firmware) | [`opencca-tfa.yml`](.github/workflows/build-tfa.yml)       | [![opencca-build](https://github.com/opencca/arm-trusted-firmware/actions/workflows/opencca-build.yml/badge.svg)](https://github.com/opencca/arm-trusted-firmware/actions/workflows/opencca-build.yml) |
-| Build kvmtool | [`opencca/kvmtool`](https://github.com/opencca/kvmtool)                           | [`build-kvmtool.yml`](.github/workflows/build-kvmtool.yml) | [![opencca-build](https://github.com/opencca/kvmtool/actions/workflows/opencca-build.yml/badge.svg)](https://github.com/opencca/kvmtool/actions/workflows/opencca-build.yml)                           |
-
-
+| Name          | Repository                                                                        | Workflow File                                              |
+| ------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Build Linux   | [`opencca/linux`](https://github.com/opencca/linux)                               | [`build-linux.yml`](.github/workflows/build-linux.yml)     |
+| Build U-Boot  | [`opencca/u-boot`](https://github.com/opencca/u-boot)                             | [`build-u-boot.yml`](.github/workflows/build-u-boot.yml)   |
+| Build TF-RMM  | [`opencca/tf-rmm`](https://github.com/opencca/tf-rmm)                             | [`build-tf-rmm.yml`](.github/workflows/build-tf-rmm.yml)   |
+| Build TFA     | [`opencca/arm-trusted-firmware`](https://github.com/opencca/arm-trusted-firmware) | [`opencca-tfa.yml`](.github/workflows/build-tfa.yml)       |
+| Build kvmtool | [`opencca/kvmtool`](https://github.com/opencca/kvmtool)                           | [`build-kvmtool.yml`](.github/workflows/build-kvmtool.yml) |
 
 
 ## Releases
@@ -80,9 +78,9 @@ wget https://github.com/opencca/opencca-releases/releases/download/firmware/snap
 The release workflows are triggered from this repository. They are in `.github/workflows/release-*.yml`
 
 **CI Jobs:**
-| Name             | Workflow File                                                                                                            | Job                                                                                                                                                                                                      |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Release Linux    | [`release-linux.yml`](.github/workflows/release-linux.yml)               | [![release-linux](https://github.com/opencca/ci-scripts/actions/workflows/release-linux.yml/badge.svg)](https://github.com/opencca/ci-scripts/actions/workflows/release-linux.yml)                       |
-| Release Firmware | [`release-firmware.yml`](.github/workflows/release-firmware.yml)         | [![release-firmware](https://github.com/opencca/ci-scripts/actions/workflows/release-firmware.yml/badge.svg)](https://github.com/opencca/ci-scripts/actions/workflows/release-firmware.yml)              |
-| Release Kvmtool  | [`release-kvmtool.yml`](.github/workflows/release-kvmtool.yml)           | [![release-kvmtool](https://github.com/opencca/ci-scripts/actions/workflows/release-kvmtool.yml/badge.svg)](https://github.com/opencca/ci-scripts/actions/workflows/release-kvmtool.yml)                 |
-| Release Rootfs   | [`release-debos-rootfs.yml`](.github/workflows/release-debos-rootfs.yml) | [![release-debian-rootfs](https://github.com/opencca/ci-scripts/actions/workflows/release-debos-rootfs.yml/badge.svg)](https://github.com/opencca/ci-scripts/actions/workflows/release-debos-rootfs.yml) |
+| Name             | Workflow File                                                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Release Linux    | [`release-linux.yml`](.github/workflows/release-linux.yml)               |
+| Release Firmware | [`release-firmware.yml`](.github/workflows/release-firmware.yml)         |
+| Release Kvmtool  | [`release-kvmtool.yml`](.github/workflows/release-kvmtool.yml)           |
+| Release Rootfs   | [`release-debos-rootfs.yml`](.github/workflows/release-debos-rootfs.yml) |
