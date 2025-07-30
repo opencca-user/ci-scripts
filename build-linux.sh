@@ -22,6 +22,7 @@ cd $BUILD_DIR/buildconf
 echo "snapshots:"
 ls -al $SNAPSHOT_DIR
 
+
 echo "debian packages:"
 ls -al $DEBIAN_OUT
 

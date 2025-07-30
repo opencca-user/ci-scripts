@@ -15,7 +15,7 @@ BUILD_DIR=$PROJECT_ROOT/opencca-build
 
 cd $BUILD_DIR/buildconf
 
-sudo ./debos_rootfs_host.mk build
+./debos_rootfs_host.mk build
 
 ls -al $SNAPSHOT_DIR
 

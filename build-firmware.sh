@@ -30,29 +30,6 @@ clone_repo() {
     fi
 }
 
-commit_hash() {
-    local dir="$1"
-    local name="$2"
-
-    cd $dir
-    commit=$(git rev-parse HEAD)
-    echo "$name: $commit"
-}
-
-#
-# XXX: We are building u-boot with a openca/main version of tfa and rmm
-#      so we get a functional artifact
-#
-RMM_REPO=https://github.com/opencca/tf-rmm.git
-RMM_REPO_BRANCH=opencca/main
-RMM_DIR=$PROJECT_ROOT/tf-rmm
-clone_repo "$RMM_DIR" "$RMM_REPO" "$RMM_REPO_BRANCH"
-
-TFA_REPO=https://github.com/opencca/arm-trusted-firmware.git
-TFA_REPO_BRANCH=opencca/main
-TFA_DIR=$PROJECT_ROOT/trusted-firmware-a
-clone_repo "$TFA_DIR" "$TFA_REPO" "$TFA_REPO_BRANCH"
-
 TFA_REPO=https://github.com/opencca/opencca-assets.git
 TFA_REPO_BRANCH=opencca/main
 TFA_DIR=$PROJECT_ROOT/opencca-assets
@@ -68,11 +45,6 @@ export DEBUG=1
 export ENABLE_OPENCCA_PERF=1
 
 ./firmware_opencca.mk build
-
-COMMIT_FILE=$SNAPSHOT_DIR/commits.txt
-commit_hash $RMM_DIR "tf-rmm" >> $COMMIT_FILE
-commit_hash $TFA_DIR "tf-rmm" >> $COMMIT_FILE
-commit_hash $UBOOT_DIR "uboot" >> $COMMIT_FILE
 
 ls -al $SNAPSHOT_DIR
 
