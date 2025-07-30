@@ -30,14 +30,7 @@ clone_repo() {
     fi
 }
 
-commit_hash() {
-    local dir="$1"
-    local name="$2"
 
-    cd $dir
-    commit=$(git rev-parse HEAD)
-    echo "$name: $commit"
-}
 
 #
 # XXX: We are building u-boot with a openca/main version of tfa and rmm
@@ -59,9 +52,6 @@ export ENABLE_OPENCCA_PERF=1
 
 ./firmware_opencca.mk build
 
-COMMIT_FILE=$SNAPSHOT_DIR/commits.txt
-commit_hash $RMM_DIR "tf-rmm" >> $COMMIT_FILE
-commit_hash $TFA_DIR "trusted-firmware-a" >> $COMMIT_FILE
-commit_hash $UBOOT_DIR "u-boot" >> $COMMIT_FILE
+
 
 ls -al $SNAPSHOT_DIR

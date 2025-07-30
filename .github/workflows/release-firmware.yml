@@ -17,7 +17,7 @@ concurrency:
 env:
   CI_REPO: https://github.com/opencca/ci-scripts
   CI_RUN_SCRIPT: run-ci.sh
-  CI_BUILD_SCRIPT: build-firmware2.sh
+  CI_BUILD_SCRIPT: build_firmware2.sh
 
 jobs:
   build-and-push:
@@ -56,14 +56,24 @@ jobs:
           git clone --depth 1 "$CI_REPO" .ci
           cd .ci
           ./"$CI_RUN_SCRIPT" "$GITHUB_WORKSPACE" ./"$CI_BUILD_SCRIPT"
-    
+          
+      - name: Mark commit hashes
+        uses: opencca/ci-scripts/.github/actions/commit-hash@opencca/main
+        with:
+          repos: |
+            ./tf-rmm tf-rmm
+            ./trusted-firmware-a trusted-firmware-a
+            ./u-boot u-boot
+          output: snapshot/commits.txt
 
       - name: Upload snapshot release
-        uses: opencca/ci-scripts/.github/release@opencca/main
+        uses: opencca/ci-scripts/.github/actions/release@opencca/main
         with:
           project: firmware
           branch: ${{ inputs.branch }}
+          lsdir: snapshot/
           artifact: |
+            snapshot/commits.txt
             snapshot/u-boot-rockchip.bin
             snapshot/u-boot-rockchip-spi.bin
             snapshot/idbloader.img

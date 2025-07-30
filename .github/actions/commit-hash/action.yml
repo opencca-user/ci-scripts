@@ -1,0 +1,33 @@
+name: "Write Commit Hashes"
+description: "Generates a commit file with the hashes of specified repos"
+
+inputs:
+  repos:
+    description: "Multi-line list of repo paths and labels (format: path label)"
+    required: true
+  output:
+    description: "Path to output file (e.g. snapshot/commits.txt)"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Write commit hashes to file
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "" > "${{ inputs.output }}"
+
+        echo "${{ inputs.repos }}" | while read -r line; do
+          dir=$(echo "$line" | cut -d' ' -f1)
+          name=$(echo "$line" | cut -d' ' -f2)
+
+          if [[ -d "$dir/.git" ]]; then
+            pushd "$dir" > /dev/null
+            commit=$(git rev-parse HEAD)
+            popd > /dev/null
+            echo "$name: $commit" >> "${{ inputs.output }}"
+          else
+            echo "Warning: $dir is not a git repo" >&2
+          fi
+        done
